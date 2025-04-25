@@ -12,13 +12,13 @@ use rand::Rng;
 // use game::*;
 
 mod component_examples;
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
+// use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use component_examples::*;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(AssetPlugin::default()))
-        .add_plugins(WorldInspectorPlugin::new())
+        // .add_plugins(WorldInspectorPlugin::new())
         .add_plugins(BlenvyPlugin {
             save_component_filter: SceneFilter::Allowlist(HashSet::from([
                 TypeId::of::<Name>(),
@@ -89,7 +89,7 @@ fn move_movers(mut movers: Query<&mut Transform, With<Dynamic>>) {
 
 fn save_game(keycode: Res<ButtonInput<KeyCode>>, mut save_requests: EventWriter<SavingRequest>) {
     if keycode.just_pressed(KeyCode::KeyS) {
-        save_requests.send(SavingRequest {
+        save_requests.write(SavingRequest {
             path: "scenes/save.scn.ron".into(),
         });
     }
@@ -97,7 +97,7 @@ fn save_game(keycode: Res<ButtonInput<KeyCode>>, mut save_requests: EventWriter<
 
 fn load_game(keycode: Res<ButtonInput<KeyCode>>, mut load_requests: EventWriter<LoadingRequest>) {
     if keycode.just_pressed(KeyCode::KeyL) {
-        load_requests.send(LoadingRequest {
+        load_requests.write(LoadingRequest {
             path: "scenes/save.scn.ron".into(),
         });
     }
