@@ -1,8 +1,8 @@
-use bevy::log::{debug, warn};
+// use bevy::log::{debug, warn};
 use bevy::prelude::*;
 use bevy::reflect::serde::ReflectDeserializer;
 use bevy::reflect::{TypeRegistration, TypeRegistry};
-use bevy::utils::HashMap;
+use bevy_platform::collections::HashMap;
 use ron::Value;
 use serde::de::DeserializeSeed;
 
@@ -38,7 +38,7 @@ pub fn ronstring_to_reflect_component(
 
 fn components_string_to_components(
     name: String,
-    value: Value,
+    _value: Value,
     parsed_value: String,
     type_registry: &TypeRegistry,
     components: &mut Vec<(Box<dyn PartialReflect>, TypeRegistration)>,
@@ -49,7 +49,7 @@ fn components_string_to_components(
     if let Some(type_registration) =
         type_registry.get_with_short_type_path(capitalized_type_name.as_str())
     {
-        debug!("TYPE INFO {:?}", type_registration.type_info());
+        // debug!("TYPE INFO {:?}", type_registration.type_info());
 
         let ron_string = format!(
             "{{ \"{}\":{} }}",
@@ -66,7 +66,7 @@ fn components_string_to_components(
             ron::ser::to_string_pretty(&serializer, ron::ser::PrettyConfig::default()).unwrap();
         println!("serialized Component {}", serialized);
         */
-        debug!("component data ron string {}", ron_string);
+        // debug!("component data ron string {}", ron_string);
         let mut deserializer = ron::Deserializer::from_str(ron_string.as_str())
             .expect("deserialzer should have been generated from string");
         let reflect_deserializer = ReflectDeserializer::new(type_registry);
@@ -79,19 +79,19 @@ fn components_string_to_components(
             )
         });*/
         let Ok(component) = reflect_deserializer.deserialize(&mut deserializer) else {
-            warn!(
-                "failed to deserialize component {} with value: {:?}",
-                name, value
-            );
+            // warn!(
+            //     "failed to deserialize component {} with value: {:?}",
+            //     name, value
+            // );
             return;
         };
 
-        debug!("component {:?}", component);
-        debug!("real type {:?}", component.get_represented_type_info());
+        // debug!("component {:?}", component);
+        // debug!("real type {:?}", component.get_represented_type_info());
         components.push((component, type_registration.clone()));
-        debug!("found type registration for {}", capitalized_type_name);
+        // debug!("found type registration for {}", capitalized_type_name);
     } else {
-        warn!("no type registration for {}", capitalized_type_name);
+        // warn!("no type registration for {}", capitalized_type_name);
     }
 }
 
@@ -108,7 +108,7 @@ fn bevy_components_string_to_components(
         };
 
         if let Some(type_registration) = type_registry.get_with_type_path(key.as_str()) {
-            debug!("TYPE INFO {:?}", type_registration.type_info());
+            // debug!("TYPE INFO {:?}", type_registration.type_info());
 
             let ron_string = format!(
                 "{{ \"{}\":{} }}",
@@ -116,7 +116,7 @@ fn bevy_components_string_to_components(
                 parsed_value
             );
 
-            debug!("component data ron string {}", ron_string);
+            // debug!("component data ron string {}", ron_string);
             let mut deserializer = ron::Deserializer::from_str(ron_string.as_str())
                 .expect("deserialzer should have been generated from string");
             let reflect_deserializer = ReflectDeserializer::new(type_registry);
@@ -129,12 +129,12 @@ fn bevy_components_string_to_components(
                     )
                 });
 
-            debug!("component {:?}", component);
-            debug!("real type {:?}", component.get_represented_type_info());
+            // debug!("component {:?}", component);
+            // debug!("real type {:?}", component.get_represented_type_info());
             components.push((component, type_registration.clone()));
-            debug!("found type registration for {}", key);
+            // debug!("found type registration for {}", key);
         } else {
-            warn!("no type registration for {}", key);
+            // warn!("no type registration for {}", key);
         }
     }
 }

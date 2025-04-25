@@ -9,12 +9,12 @@ use bevy_xpbd_3d::prelude::Physics;
 use bevy_xpbd_3d::prelude::*;
 
 pub(crate) fn pause_physics(mut time: ResMut<Time<Physics>>) {
-    info!("pausing physics");
+    // info!("pausing physics");
     time.pause();
 }
 
 pub(crate) fn resume_physics(mut time: ResMut<Time<Physics>>) {
-    info!("unpausing physics");
+    // info!("unpausing physics");
     time.unpause();
 }
 

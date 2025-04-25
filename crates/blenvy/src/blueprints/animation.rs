@@ -1,6 +1,5 @@
 use bevy::prelude::*;
-use bevy::utils::HashMap;
-
+use bevy_platform::collections::HashMap;
 #[derive(Component, Reflect, Default, Debug)]
 #[reflect(Component)]
 /// storage for animations for a given entity's BLUEPRINT (ie for example a characters animations)
@@ -146,7 +145,7 @@ pub fn trigger_blueprint_animation_markers_events(
                                 let diff = frame as f32 - frame_seconds;
                                 if diff < 0.1 {
                                     for marker_name in matching_markers_per_frame {
-                                        animation_marker_events.send(AnimationMarkerReached {
+                                        animation_marker_events.write(AnimationMarkerReached {
                                             entity,
                                             animation_name: animation_name.clone(),
                                             frame,

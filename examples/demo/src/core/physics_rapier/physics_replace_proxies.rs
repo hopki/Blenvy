@@ -48,7 +48,7 @@ pub(crate) fn physics_replace_proxies(
         let mut rapier_collider: RapierCollider;
         match collider_proxy {
             Collider::Ball(radius) => {
-                info!("generating collider from proxy: ball");
+                // info!("generating collider from proxy: ball");
                 rapier_collider = RapierCollider::ball(*radius);
                 commands.entity(entity)
                     .insert(rapier_collider)
@@ -56,7 +56,7 @@ pub(crate) fn physics_replace_proxies(
                     ;
             }
             Collider::Cuboid(size) => {
-                info!("generating collider from proxy: cuboid");
+                // info!("generating collider from proxy: cuboid");
                 rapier_collider = RapierCollider::cuboid(size.x, size.y, size.z);
                 commands.entity(entity)
                     .insert(rapier_collider)
@@ -64,7 +64,7 @@ pub(crate) fn physics_replace_proxies(
                     ;
             }
             Collider::Capsule(a, b, radius) => {
-                info!("generating collider from proxy: capsule");
+                // info!("generating collider from proxy: capsule");
                 rapier_collider = RapierCollider::capsule(*a, *b, *radius);
                 commands.entity(entity)
                     .insert(rapier_collider)
@@ -72,7 +72,7 @@ pub(crate) fn physics_replace_proxies(
                     ;
             }
             Collider::Mesh => {
-                info!("generating collider from proxy: mesh");
+                // info!("generating collider from proxy: mesh");
                 for (_, collider_mesh) in
                     Mesh::search_in_children(entity, &children, &meshes, &mesh_handles)
                 {

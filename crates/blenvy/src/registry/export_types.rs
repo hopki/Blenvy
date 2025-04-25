@@ -1,6 +1,6 @@
 use crate::{AssetRoot, BlenvyConfig};
 use bevy::{
-    log::info,
+    // log::info,
     prelude::{AppTypeRegistry, ReflectComponent, ReflectResource, World},
     reflect::{TypeInfo, TypeRegistration, VariantInfo},
 };
@@ -41,7 +41,7 @@ pub fn export_types(world: &mut World) {
     )
     .expect("valid json");
 
-    info!("Done exporting registry schema");
+    // info!("Done exporting registry schema");
 }
 
 pub fn export_type(reg: &TypeRegistration) -> (String, Value) {

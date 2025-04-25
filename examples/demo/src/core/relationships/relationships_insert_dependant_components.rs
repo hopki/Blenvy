@@ -10,6 +10,6 @@ pub fn insert_dependant_component<
     for (entity, name) in entities_without_depency.iter() {
         let name = name.clone().to_string();
         commands.entity(entity).insert(Dependency::default());
-        warn!("found an entity called {} with a {} component but without an {}, please check your assets", name.clone(), std::any::type_name::<Dependant>(), std::any::type_name::<Dependency>());
+        // warn!("found an entity called {} with a {} component but without an {}, please check your assets", name.clone(), std::any::type_name::<Dependant>(), std::any::type_name::<Dependency>());
     }
 }

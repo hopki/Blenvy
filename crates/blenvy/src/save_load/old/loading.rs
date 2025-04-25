@@ -43,7 +43,7 @@ pub(crate) fn mark_load_requested(
 // TODO: replace with generic despawner ?
 pub(crate) fn unload_world(mut commands: Commands, gameworlds: Query<Entity, With<GameWorldTag>>) {
     for e in gameworlds.iter() {
-        info!("--loading: despawn old world/level");
+        // info!("--loading: despawn old world/level");
         commands.entity(e).despawn_recursive();
     }
 }
@@ -54,11 +54,11 @@ pub(crate) fn load_game(
     load_request: Res<LoadRequested>,
     save_load_config: Res<SaveLoadConfig>,
 ) {
-    info!("--loading: load dynamic data");
+    // info!("--loading: load dynamic data");
     let save_path = load_request.path.clone();
     let save_path = Path::new(&save_load_config.save_path).join(Path::new(save_path.as_str()));
 
-    info!("LOADING FROM {:?}", save_path);
+    // info!("LOADING FROM {:?}", save_path);
 
     let world_root = commands
         .spawn((
@@ -87,7 +87,7 @@ pub(crate) fn load_game(
 
     commands.insert_resource(LoadFirstStageDone);
 
-    info!("--loading: loaded dynamic data");
+    // info!("--loading: loaded dynamic data");
 }
 
 pub(crate) fn load_static(
@@ -99,7 +99,7 @@ pub(crate) fn load_static(
     static_entities: Option<Res<StaticEntitiesStorage>>,
 ) {
     if let Some(info) = static_entities {
-        info!("--loading static data {:?}", info.name);
+        // info!("--loading static data {:?}", info.name);
         let static_data = commands
             .spawn((
                 Name::from("static"),
@@ -120,7 +120,7 @@ pub(crate) fn load_static(
         let world_root = world_root.get_single().unwrap();
         commands.entity(world_root).add_child(static_data);
 
-        info!("--loading: loaded static data");
+        // info!("--loading: loaded static data");
         for entity in dynamic_worlds.iter() {
             commands.entity(entity).insert(
                 CleanupScene, // we mark this scene as needing a cleanup
@@ -143,7 +143,7 @@ pub(crate) fn cleanup_loaded_scene(
     mut commands: Commands,
 ) {
     for loaded_scene in loaded_scenes.iter() {
-        info!("REMOVING DynamicScene");
+        // info!("REMOVING DynamicScene");
         commands
             .entity(loaded_scene)
             .remove::<Handle<DynamicScene>>()

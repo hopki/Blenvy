@@ -54,8 +54,8 @@ pub(crate) fn prepare_loading(
     gameworlds: Query<Entity, With<GameWorldTag>>,
 ) {
     for e in gameworlds.iter() {
-        info!("--loading: despawn old world/level");
-        commands.entity(e).despawn_recursive();
+        // info!("--loading: despawn old world/level");
+        commands.entity(e).despawn();
     }
 }
 
@@ -64,11 +64,11 @@ pub(crate) fn load_game(
     asset_server: Res<AssetServer>,
     load_request: Res<LoadingRequested>,
 ) {
-    info!("--loading: load dynamic data");
+    // info!("--loading: load dynamic data");
 
     //let save_path = Path::new(load_request.path.clone().as_str());
 
-    info!("LOADING FROM {:?}", load_request.path.clone());
+    // info!("LOADING FROM {:?}", load_request.path.clone());
 
     /*let world_root = commands
     .spawn((
@@ -104,6 +104,6 @@ pub(crate) fn load_game(
 
     // commands.insert_resource(LoadFirstStageDone);
 
-    info!("--loading: loaded dynamic data");
+    // info!("--loading: loaded dynamic data");
     commands.remove_resource::<LoadingRequested>();
 }

@@ -61,7 +61,7 @@ pub fn trigger_level_transition(
                     let current_game_world = game_world.single();
 
                     // remove current level/world
-                    info!("despawning current level");
+                    // info!("despawning current level");
                     commands.entity(current_game_world.0).despawn_recursive();
 
                     let target_level = &transition_trigger.target;
@@ -74,7 +74,7 @@ pub fn trigger_level_transition(
                     } else {
                         level = game_assets.world.clone().unwrap();
                     }
-                    info!("spawning new level");
+                    // info!("spawning new level");
                     commands.spawn((
                         SceneBundle {
                             // note: because of this issue https://github.com/bevyengine/bevy/issues/10436, "world" is now a gltf file instead of a scene

@@ -44,8 +44,8 @@ pub fn should_save(saving_requests: Option<Res<SavingRequested>>) -> bool {
 // any child of dynamic/ saveable entities that is not saveable itself should be removed from the list of children
 pub(crate) fn prepare_save_game(
     saveables: Query<Entity, (With<Dynamic>, With<BlueprintInfo>)>,
-    root_entities: Query<Entity, Or<(With<DynamicEntitiesRoot>, Without<Parent>)>>, //  With<DynamicEntitiesRoot>
-    dynamic_entities: Query<(Entity, &Parent, Option<&Children>), With<Dynamic>>,
+    root_entities: Query<Entity, Or<(With<DynamicEntitiesRoot>, Without<ChildOf>)>>, //  With<DynamicEntitiesRoot>
+    dynamic_entities: Query<(Entity, &ChildOf, Option<&Children>), With<Dynamic>>,
     _static_entities: Query<(Entity, &BlueprintInfo), With<StaticEntitiesRoot>>,
 
     mut commands: Commands,
@@ -55,18 +55,18 @@ pub(crate) fn prepare_save_game(
         commands.entity(entity).insert(SpawnBlueprint);
     }
 
-    for (entity, parent, children) in dynamic_entities.iter() {
+    for (entity, child_of, children) in dynamic_entities.iter() {
         println!("prepare save game for entity");
-        let parent = parent.get();
+        let parent = child_of.parent();
         if root_entities.contains(parent) {
             commands.entity(entity).insert(RootEntity);
         }
 
         if let Some(children) = children {
             for sub_child in children.iter() {
-                if !dynamic_entities.contains(*sub_child) {
-                    commands.entity(*sub_child).insert(OriginalParent(entity));
-                    commands.entity(entity).remove_children(&[*sub_child]);
+                if !dynamic_entities.contains(sub_child) {
+                    commands.entity(sub_child).insert(OriginalParent(entity));
+                    commands.entity(entity).remove_children(&[sub_child]);
                 }
             }
         }
@@ -81,13 +81,13 @@ pub(crate) fn prepare_save_game(
 }
 
 pub(crate) fn save_game(world: &mut World) {
-    info!("saving");
+    // info!("saving");
 
     let mut save_path: String = "".into();
     let mut events = world.resource_mut::<Events<SavingRequest>>();
 
     for event in events.get_cursor().read(&events) {
-        info!("SAVE EVENT !! {:?}", event);
+        // info!("SAVE EVENT !! {:?}", event);
         save_path.clone_from(&event.path);
     }
     events.clear();
@@ -104,8 +104,8 @@ pub(crate) fn save_game(world: &mut World) {
         .iter(world)
         .collect();
 
-    info!("saveable entities {}", saveable_entities.len());
-    info!("saveable root entities {}", saveable_root_entities.len());
+    // info!("saveable entities {}", saveable_entities.len());
+    // info!("saveable root entities {}", saveable_root_entities.len());
 
     let config = world
         .get_resource::<BlenvyConfig>()
@@ -127,7 +127,7 @@ pub(crate) fn save_game(world: &mut World) {
         ;
 
     // for root entities, it is the same EXCEPT we make sure parents are not included
-    let filter_root = filter.clone().deny::<Parent>();
+    let filter_root = filter.clone().deny::<ChildOf>();
 
     let filter_resources = config
         .clone()
@@ -170,7 +170,7 @@ pub(crate) fn save_game(world: &mut World) {
     let save_path_assets = Path::new("assets")
         //.join(&config.save_path)
         .join(Path::new(save_path.as_str())); // Path::new(&save_load_config.save_path).join(Path::new(save_path.as_str()));
-    info!("saving game to {:?}", save_path_assets);
+                                              // info!("saving game to {:?}", save_path_assets);
 
     // world.send_event(SavingFinished);
     let bla = save_path_assets.clone().to_string_lossy().into_owned();
@@ -208,7 +208,7 @@ pub(crate) fn cleanup_save(
         commands.entity(original_parent.0).add_child(entity);
     }
     // commands.remove_resource::<StaticEntitiesStorage>();
-    saving_finished.send(SaveFinished);
+    saving_finished.write(SaveFinished);
 
     commands.remove_resource::<SavingRequested>();
 }

@@ -74,13 +74,13 @@ pub(crate) fn prepare_save_game(
 }
 
 pub(crate) fn save_game(world: &mut World) {
-    info!("saving");
+    // info!("saving");
 
     let mut save_path: String = "".into();
     let mut events = world.resource_mut::<Events<SavingRequest>>();
 
     for event in events.get_reader().read(&events) {
-        info!("SAVE EVENT !! {:?}", event);
+        // info!("SAVE EVENT !! {:?}", event);
         save_path.clone_from(&event.path);
     }
     events.clear();
@@ -95,8 +95,8 @@ pub(crate) fn save_game(world: &mut World) {
         .iter(world)
         .collect();
 
-    info!("saveable entities {}", saveable_entities.len());
-    info!("saveable root entities {}", saveable_root_entities.len());
+    // info!("saveable entities {}", saveable_entities.len());
+    // info!("saveable root entities {}", saveable_root_entities.len());
 
     let save_load_config = world
         .get_resource::<SaveLoadConfig>()
@@ -159,7 +159,7 @@ pub(crate) fn save_game(world: &mut World) {
     let save_path = Path::new("assets")
         .join(&save_load_config.save_path)
         .join(Path::new(save_path.as_str())); // Path::new(&save_load_config.save_path).join(Path::new(save_path.as_str()));
-    info!("saving game to {:?}", save_path);
+    // info!("saving game to {:?}", save_path);
 
     // world.send_event(SavingFinished);
 

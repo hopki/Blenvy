@@ -6,7 +6,7 @@ use bevy_rapier3d::prelude::Velocity;
 use rand::Rng;
 
 pub fn setup_game(mut commands: Commands, mut next_game_state: ResMut<NextState<GameState>>) {
-    info!("setting up game world");
+    // info!("setting up game world");
     // here we actually spawn our game world/level
     let world_root = commands
         .spawn((
@@ -55,7 +55,7 @@ pub fn setup_game(mut commands: Commands, mut next_game_state: ResMut<NextState<
 // TODO: Same as in load, reuse
 pub fn unload_world(mut commands: Commands, gameworlds: Query<Entity, With<GameWorldTag>>) {
     for e in gameworlds.iter() {
-        info!("--loading: despawn old world/level");
+        // info!("--loading: despawn old world/level");
         commands.entity(e).despawn_recursive();
     }
 }

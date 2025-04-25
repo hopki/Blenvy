@@ -47,7 +47,7 @@ pub(crate) fn physics_replace_proxies(
         let mut xpbd_collider: XpbdCollider;
         match collider_proxy {
             Collider::Ball(radius) => {
-                info!("generating collider from proxy: ball");
+                // info!("generating collider from proxy: ball");
                 xpbd_collider = XpbdCollider::sphere(*radius);
                 commands.entity(entity)
                     .insert(xpbd_collider)
@@ -55,7 +55,7 @@ pub(crate) fn physics_replace_proxies(
                     ;
             }
             Collider::Cuboid(size) => {
-                info!("generating collider from proxy: cuboid");
+                // info!("generating collider from proxy: cuboid");
                 xpbd_collider = XpbdCollider::cuboid(size.x, size.y, size.z);
                 commands.entity(entity)
                     .insert(xpbd_collider)
@@ -63,11 +63,11 @@ pub(crate) fn physics_replace_proxies(
                     ;
             }
             Collider::Capsule(a, b, radius) => {
-                info!("generating collider from proxy: capsule");
+                // info!("generating collider from proxy: capsule");
                 // FIXME: temp
                 let height = Vec3::distance(*a, *b);
                 xpbd_collider = XpbdCollider::capsule(height, *radius);
-                info!("CAPSULE {} {}", height, radius);
+                // info!("CAPSULE {} {}", height, radius);
                 commands.entity(entity)
                     .insert(xpbd_collider)
                     .insert(    Mass(5.0)                )
@@ -75,7 +75,7 @@ pub(crate) fn physics_replace_proxies(
                     ;
             }
             Collider::Mesh => {
-                info!("generating collider from proxy: mesh");
+                // info!("generating collider from proxy: mesh");
                 for (_, collider_mesh) in
                     Mesh::search_in_children(entity, &children, &meshes, &mesh_handles)
                 {

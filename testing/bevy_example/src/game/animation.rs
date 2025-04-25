@@ -73,7 +73,7 @@ pub fn animations(
                         .entity(entity)
                         .insert(InstanceAnimationPlayerLink(ancestor));
                 }
-                // info!("{:?} is an ancestor of {:?}", ancestor, player);
+                // // info!("{:?} is an ancestor of {:?}", ancestor, player);
             }
         }
     }

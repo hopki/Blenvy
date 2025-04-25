@@ -7,12 +7,12 @@ use bevy::{
 use bevy_rapier3d::{prelude::RapierConfiguration, render::DebugRenderContext};
 
 pub(crate) fn pause_physics(mut physics_config: ResMut<RapierConfiguration>) {
-    info!("pausing physics");
+    // info!("pausing physics");
     physics_config.physics_pipeline_active = false;
 }
 
 pub(crate) fn resume_physics(mut physics_config: ResMut<RapierConfiguration>) {
-    info!("unpausing physics");
+    // info!("unpausing physics");
     physics_config.physics_pipeline_active = true;
 }
 

@@ -1,4 +1,3 @@
-use bevy::ecs::world::Command;
 use bevy::prelude::*;
 use std::any::TypeId;
 
@@ -41,14 +40,14 @@ impl CopyComponents {
 
                     let type_id = component_info.type_id().unwrap();
                     if self.exclude.contains(&type_id) {
-                        debug!("excluding component: {:?}", component_info.name());
+                        // debug!("excluding component: {:?}", component_info.name());
                         None
                     } else {
-                        debug!(
-                            "cloning: component: {:?} {:?}",
-                            component_info.name(),
-                            type_id
-                        );
+                        // debug!(
+                        //     "cloning: component: {:?} {:?}",
+                        //     component_info.name(),
+                        //     type_id
+                        // );
 
                         if let Some(type_registration) = registry.get(type_id) {
                             Some(type_registration)
@@ -60,10 +59,10 @@ impl CopyComponents {
                                 )
                             }));
                         } else {
-                            warn!(
-                                "cannot clone component: component: {:?} is not registered",
-                                component_info.name()
-                            );
+                            // warn!(
+                            //     "cannot clone component: component: {:?} is not registered",
+                            //     component_info.name()
+                            // );
                             None
                         }
                     }
@@ -89,7 +88,7 @@ impl CopyComponents {
             let source = component
                 .reflect(world.get_entity(self.source).unwrap())
                 .unwrap()
-                .clone_value();
+                .to_dynamic();
 
             let mut destination = world
                 .get_entity_mut(self.destination)

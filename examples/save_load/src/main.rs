@@ -1,6 +1,7 @@
 use std::any::TypeId;
 
-use bevy::{prelude::*, utils::hashbrown::HashSet};
+use bevy::prelude::*;
+use bevy_platform::collections::HashSet;
 use blenvy::{
     AddToGameWorld, BlenvyPlugin, BlueprintInfo, BlueprintWorld, Dynamic, HideUntilReady,
     LoadingRequest, SavingRequest, SpawnBlueprint,
@@ -74,7 +75,7 @@ fn spawn_blueprint_instance(keycode: Res<ButtonInput<KeyCode>>, mut commands: Co
             bevy::prelude::Name::from(format!("test{}", name_index)),
             HideUntilReady,
             AddToGameWorld,
-            TransformBundle::from_transform(Transform::from_xyz(x, 2.0, y)),
+            Transform::from_xyz(x, 2.0, y),
         ));
     }
 }

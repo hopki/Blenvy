@@ -115,6 +115,7 @@ fn process_background_shader(
             color: background_shader.color,
             // Just a guess, see <https://github.com/bevyengine/bevy/issues/12280>
             brightness: background_shader.strength * 400.0,
+            affects_lightmapped_meshes: true,
         });
         commands.insert_resource(ClearColor(background_shader.color));
     }
@@ -155,7 +156,7 @@ fn process_colorgrading(
 ) {
     for entity in cameras.iter() {
         for (scene_id, blender_colorgrading) in blender_colorgradings.iter() {
-            info!("COLOR GRADING");
+            // info!("COLOR GRADING");
             commands.entity(entity).insert(ColorGrading {
                 global: ColorGradingGlobal {
                     exposure: blender_colorgrading.exposure,
