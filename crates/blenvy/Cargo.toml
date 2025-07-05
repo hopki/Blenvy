@@ -14,13 +14,18 @@ license = "MIT OR Apache-2.0"
 workspace = true
 
 [dependencies]
-bevy = { version = "^0.16", default-features = false, features = ["bevy_asset", "bevy_scene", "bevy_gltf", "animation"] }
-bevy_platform = "^0.16"
-serde = "1.0.188"
-ron = "0.8.1"
-serde_json = "1.0.108"
-bevy_common_assets = { git = "https://github.com/mdds-labs/bevy_common_assets", branch = "bevy-0.16", features = ["ron"]}
+bevy = { workspace = true, default-features = false, features = [
+    "bevy_asset",
+    "bevy_scene",
+    "bevy_gltf",
+    "animation",
+] }
+serde.workspace = true
+ron.workspace = true
+serde_json.workspace = true
+bevy_common_assets = { workspace = true, features = ["ron"] }
+tracing.workspace = true
 
 
 [dev-dependencies]
-bevy = { version = "^0.16", default-features = false, features = ["dynamic_linking"] }
+bevy = { version = "0.14", default-features = false, features = ["dynamic_linking"] }

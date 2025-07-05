@@ -61,8 +61,8 @@ pub fn trigger_level_transition(
                     let current_game_world = game_world.single();
 
                     // remove current level/world
-                    // info!("despawning current level");
-                    commands.entity(current_game_world.0).despawn_recursive();
+                    info!("despawning current level");
+                    commands.entity(current_game_world.0).despawn();
 
                     let target_level = &transition_trigger.target;
                     let level: Handle<Gltf>;

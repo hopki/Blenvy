@@ -1,7 +1,6 @@
 use std::any::TypeId;
 
-use bevy::prelude::*;
-use bevy_platform::collections::HashSet;
+use bevy::{prelude::*, platform::collections::HashSet};
 use blenvy::{
     AddToGameWorld, BlenvyPlugin, BlueprintInfo, BlueprintWorld, Dynamic, HideUntilReady,
     LoadingRequest, SavingRequest, SpawnBlueprint,
@@ -12,34 +11,39 @@ use rand::Rng;
 // use game::*;
 
 mod component_examples;
-// use bevy_inspector_egui::quick::WorldInspectorPlugin;
+#[cfg(feature = "bevy-inspector")]
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use component_examples::*;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(AssetPlugin::default()))
-        // .add_plugins(WorldInspectorPlugin::new())
-        .add_plugins(BlenvyPlugin {
-            save_component_filter: SceneFilter::Allowlist(HashSet::from([
-                TypeId::of::<Name>(),
-                TypeId::of::<Transform>(),
-                //TypeId::of::<Velocity>(),
-                TypeId::of::<InheritedVisibility>(),
-                TypeId::of::<Camera>(),
-                TypeId::of::<Camera3d>(),
-                //TypeId::of::<Tonemapping>(),
-                //TypeId::of::<CameraTrackingOffset>(),
-                TypeId::of::<Projection>(),
-                //TypeId::of::<CameraRenderGraph>(),
-                //TypeId::of::<Frustum>(),
-                TypeId::of::<GlobalTransform>(),
-                //TypeId::of::<VisibleEntities>(),
-                //TypeId::of::<Pickable>(),
-            ])),
-            ..Default::default()
-        })
-        // .add_plugins(GamePlugin)
-        .add_plugins(ComponentsExamplesPlugin)
+        .add_plugins((
+            DefaultPlugins.set(AssetPlugin::default()),
+            #[cfg(feature = "bevy-inspector")]
+            WorldInspectorPlugin::new(),
+            BlenvyPlugin {
+                save_component_filter: SceneFilter::Allowlist(HashSet::from([
+                    TypeId::of::<Name>(),
+                    TypeId::of::<Transform>(),
+                    //TypeId::of::<Velocity>(),
+                    TypeId::of::<InheritedVisibility>(),
+                    TypeId::of::<Camera>(),
+                    TypeId::of::<Camera3d>(),
+                    //TypeId::of::<Tonemapping>(),
+                    //TypeId::of::<CameraTrackingOffset>(),
+                    TypeId::of::<Projection>(),
+                    //TypeId::of::<CameraRenderGraph>(),
+                    //TypeId::of::<Frustum>(),
+                    TypeId::of::<GlobalTransform>(),
+                    //TypeId::of::<VisibleEntities>(),
+                    //TypeId::of::<Pickable>(),
+                ])),
+                ..Default::default()
+            },
+            // our custom plugins
+            // GamePlugin,           // specific to our game
+            ComponentsExamplesPlugin, // Showcases different type of components /structs
+        ))
         .add_systems(Startup, setup_game)
         .add_systems(
             Update,
@@ -60,13 +64,13 @@ fn setup_game(mut commands: Commands) {
 fn spawn_blueprint_instance(keycode: Res<ButtonInput<KeyCode>>, mut commands: Commands) {
     if keycode.just_pressed(KeyCode::KeyT) {
         // random position
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
         let range = 5.5;
-        let x: f32 = rng.gen_range(-range..range);
-        let y: f32 = rng.gen_range(-range..range);
+        let x: f32 = rng.random_range(-range..range);
+        let y: f32 = rng.random_range(-range..range);
 
         // random name
-        let name_index: u64 = rng.gen();
+        let name_index: u64 = rng.random();
 
         commands.spawn((
             BlueprintInfo::from_path("blueprints/test.glb"),

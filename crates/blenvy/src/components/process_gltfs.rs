@@ -1,16 +1,17 @@
 use bevy::{
     ecs::{
         entity::Entity,
+        hierarchy::ChildOf,
         name::Name,
         query::{Added, Without},
         reflect::{AppTypeRegistry, ReflectComponent},
         world::World,
     },
     gltf::{GltfExtras, GltfMaterialExtras, GltfMeshExtras, GltfSceneExtras},
-    prelude::*,
-    reflect::TypeRegistration,
+    platform::collections::HashMap,
+    reflect::{PartialReflect, TypeRegistration},
 };
-use bevy_platform::collections::HashMap;
+use tracing::{debug, warn};
 
 use crate::{ronstring_to_reflect_component, GltfProcessed};
 
@@ -18,7 +19,7 @@ use crate::{ronstring_to_reflect_component, GltfProcessed};
 fn find_entity_components(
     entity: Entity,
     name: Option<&Name>,
-    child_of: Option<&ChildOf>,
+    parent: Option<&ChildOf>,
     reflect_components: Vec<(Box<dyn PartialReflect>, TypeRegistration)>,
     entity_components: &HashMap<Entity, Vec<(Box<dyn PartialReflect>, TypeRegistration)>>,
 ) -> (Entity, Vec<(Box<dyn PartialReflect>, TypeRegistration)>) {
@@ -29,8 +30,8 @@ fn find_entity_components(
     if child_of.is_some() {
         if let Some(name) = name {
             if name.as_str().contains("components") || name.as_str().ends_with("_pa") {
-                // debug!("adding components to parent");
-                target_entity = child_of.expect("the target entity had a parent ").parent();
+                debug!("adding components to parent");
+                target_entity = parent.expect("the target entity had a parent ").parent();
             }
         }
     }
@@ -43,11 +44,15 @@ fn find_entity_components(
         let current_components = &entity_components[&target_entity];
         // first inject the current components
         for (component, type_registration) in current_components {
-            updated_components.push((component.to_dynamic(), type_registration.clone()));
+            //updated_components.push((component.clone().downcast().unwrap(), type_registration.clone()));
+            updated_components.push((
+                component.reflect_clone().unwrap(),
+                type_registration.clone(),
+            ));
         }
         // then inject the new components: this also enables overwrite components set in the collection
         for (component, type_registration) in reflect_components {
-            updated_components.push((component.to_dynamic(), type_registration));
+            updated_components.push((component.reflect_clone().unwrap(), type_registration));
         }
         return (target_entity, updated_components);
     }
@@ -154,7 +159,8 @@ pub fn add_components_from_gltf_extras(world: &mut World) {
                     entity_mut.insert(GltfProcessed);
                     continue;
                 };
-                reflected_component.insert(&mut entity_mut, &*component, &type_registry);
+
+                reflected_component.insert(&mut entity_mut, &*component.into_partial_reflect(), &type_registry);
 
                 entity_mut.insert(GltfProcessed); //
             }

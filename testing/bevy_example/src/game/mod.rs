@@ -14,10 +14,9 @@ use blenvy::{
 use crate::{AppState, GameState};
 use bevy::{
     prelude::*,
-    render::view::screenshot::{save_to_disk, Capturing, Screenshot},
     time::common_conditions::on_timer,
-    window::SystemCursorIcon,
-    winit::cursor::CursorIcon,
+    render::view::screenshot::{save_to_disk, Capturing, Screenshot},
+    window::PrimaryWindow,
 };
 
 use json_writer::to_json_string;
@@ -35,7 +34,7 @@ fn start_game(mut next_app_state: ResMut<NextState<AppState>>) {
 #[allow(clippy::too_many_arguments)]
 #[allow(clippy::type_complexity)]
 fn validate_export(
-    child_of: Query<&ChildOf>,
+    parents: Query<&ChildOf>,
     children: Query<&Children>,
     names: Query<&Name>,
     blueprints: Query<(Entity, &Name, &BlueprintInfo)>,
@@ -95,7 +94,7 @@ fn validate_export(
                 .get(child)
                 .map_or(String::from("no_name"), |e| e.to_string()); //|e| e.to_string(), || "no_name".to_string());
                                                                      //println!("  child {}", child_name);
-            let parent = child_of.get(child).unwrap();
+            let parent = parents.get(child).unwrap();
             let parent_name: String = names
                 .get(parent.parent())
                 .map_or(String::from("no_name"), |e| e.to_string()); //|e| e.to_string(), || "no_name".to_string());
@@ -118,33 +117,10 @@ fn validate_export(
     .expect("Unable to write file");
 }
 
-fn generate_screenshot(mut commands: Commands, mut counter: Local<u32>) {
-    let path = format!("./screenshot-{}.png", *counter);
-    *counter += 1;
+fn generate_screenshot(mut commands: Commands) {
     commands
         .spawn(Screenshot::primary_window())
-        .observe(save_to_disk(path));
-}
-
-fn screenshot_saving(
-    mut commands: Commands,
-    screenshot_saving: Query<Entity, With<Capturing>>,
-    windows: Query<Entity, With<Window>>,
-) {
-    let Ok(window) = windows.single() else {
-        return;
-    };
-    match screenshot_saving.iter().count() {
-        0 => {
-            commands.entity(window).remove::<CursorIcon>();
-        }
-        x if x > 0 => {
-            commands
-                .entity(window)
-                .insert(CursorIcon::from(SystemCursorIcon::Progress));
-        }
-        _ => {}
-    }
+        .observe(save_to_disk("screenshot.png"));
 }
 
 fn exit_game(mut app_exit_events: ResMut<Events<bevy::app::AppExit>>) {

@@ -1,5 +1,8 @@
 use std::path::Path;
 
+use bevy::{gltf::Gltf, platform::collections::HashMap, prelude::*, scene::SceneInstance};
+use tracing::{debug, info, warn};
+
 use crate::{
     AnimationInfos, AssetLoadTracker, AssetToBlueprintInstancesMapper, BlueprintAnimationInfosLink,
     BlueprintAnimationPlayerLink, BlueprintAnimations, BlueprintAssetsLoadState,
@@ -455,10 +458,10 @@ pub(crate) fn blueprints_assets_loaded(
     mut commands: Commands,
 ) {
     for (entity, blueprint_info, transform, name) in spawn_placeholders.iter() {
-        // println!(
-        //     "BLUEPRINT: all assets loaded, attempting to spawn blueprint SCENE {:?} for entity {:?}, id: {:}, parent:{:?}",
-        //     blueprint_info.name, name, entity, original_parent
-        // );
+        /*info!(
+            "BLUEPRINT: all assets loaded, attempting to spawn blueprint SCENE {:?} for entity {:?}, id: {:}, parent:{:?}",
+            blueprint_info.name, name, entity, original_parent
+        );*/
 
         println!(
             "Step 3: all assets loaded, attempting to spawn blueprint scene {:?} for entity {:?}, id: {}",
@@ -515,7 +518,7 @@ pub(crate) fn blueprints_assets_loaded(
 
         commands.entity(entity).insert((
             SceneRoot(scene.clone()),
-            Transform::from(transforms),
+            transforms,
             OriginalChildren(original_children),
             BlueprintAnimations {
                 // TODO: perhaps swap this out with InstanceAnimations depending on whether we are spawning a level or a simple blueprint
@@ -716,20 +719,15 @@ pub(crate) fn blueprints_cleanup_spawned_scene(
         // we move all of children of the blueprint instance one level to the original entity to avoid having an additional, useless nesting level
         if let Ok(root_entity_children) = all_children.get(blueprint_root_entity) {
             for child in root_entity_children.iter() {
-                // println!(
-                //     "copying child {:?} upward from {:?} to {:?}",
-                //     names.get(child),
-                //     blueprint_root_entity,
-                //     original
-                // );
+                // info!("copying child {:?} upward from {:?} to {:?}", names.get(child), blueprint_root_entity, original);
                 commands.entity(original).add_child(child);
             }
         }
 
         if animations.named_animations.keys().len() > 0 {
-            for (entity_with_player, child_of) in animation_players.iter() {
-                if child_of.parent() == blueprint_root_entity {
-                    println!(
+            for (entity_with_player, parent) in animation_players.iter() {
+                if parent.parent() == blueprint_root_entity {
+                    debug!(
                         "FOUND ANIMATION PLAYER FOR {:?} {:?} ",
                         all_names.get(original),
                         all_names.get(entity_with_player)
@@ -746,8 +744,7 @@ pub(crate) fn blueprints_cleanup_spawned_scene(
 
                     commands
                         .entity(entity_with_player)
-                        .insert(transitions)
-                        .insert(animations.graph.clone());
+                        .insert((transitions, AnimationGraphHandle(animations.graph.clone())));
                 }
             }
             // FIXME VERY convoluted, but it works

@@ -1,10 +1,9 @@
-// use bevy::log::{debug, warn};
-use bevy::prelude::*;
+use bevy::platform::collections::HashMap;
 use bevy::reflect::serde::ReflectDeserializer;
-use bevy::reflect::{TypeRegistration, TypeRegistry};
-use bevy_platform::collections::HashMap;
+use bevy::reflect::{PartialReflect, TypeRegistration, TypeRegistry};
 use ron::Value;
 use serde::de::DeserializeSeed;
+use tracing::{debug, warn};
 
 use super::capitalize_first_letter;
 
@@ -14,7 +13,7 @@ pub fn ronstring_to_reflect_component(
 ) -> Vec<(Box<dyn PartialReflect>, TypeRegistration)> {
     let lookup: HashMap<String, Value> = ron::from_str(ron_string).unwrap();
     let mut components: Vec<(Box<dyn PartialReflect>, TypeRegistration)> = Vec::new();
-    // println!("ron_string {:?}", ron_string);
+    // debug!("ron_string {:?}", ron_string);
     for (name, value) in lookup.into_iter() {
         let parsed_value: String = match value.clone() {
             Value::String(str) => str,

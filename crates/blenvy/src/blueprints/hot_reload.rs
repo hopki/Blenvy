@@ -3,9 +3,11 @@ use crate::{
     BlueprintSpawning, FromBlueprint, SpawnBlueprint, SubBlueprintsSpawnTracker,
 };
 use bevy::asset::AssetEvent;
+use bevy::platform::collections::HashMap;
 use bevy::prelude::*;
 use bevy::scene::SceneInstance;
-use bevy_platform::collections::HashMap;
+use tracing::info;
+
 /// Resource mapping asset paths (ideally untyped ids, but more complex) to a list of blueprint instance entity ids
 #[derive(Debug, Clone, Resource, Default)]
 pub(crate) struct AssetToBlueprintInstancesMapper {

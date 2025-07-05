@@ -4,6 +4,7 @@ use std::path::Path;
 
 use bevy::prelude::World;
 use bevy::{prelude::*, tasks::IoTaskPool};
+use tracing::info;
 
 use crate::{BlenvyConfig, BlueprintInfo, Dynamic, FromBlueprint, RootEntity, SpawnBlueprint};
 
@@ -55,9 +56,9 @@ pub(crate) fn prepare_save_game(
         commands.entity(entity).insert(SpawnBlueprint);
     }
 
-    for (entity, child_of, children) in dynamic_entities.iter() {
-        println!("prepare save game for entity");
-        let parent = child_of.parent();
+    for (entity, parent, children) in dynamic_entities.iter() {
+        let parent = parent.parent();
+        debug!("prepare save game for entity");
         if root_entities.contains(parent) {
             commands.entity(entity).insert(RootEntity);
         }
@@ -87,7 +88,7 @@ pub(crate) fn save_game(world: &mut World) {
     let mut events = world.resource_mut::<Events<SavingRequest>>();
 
     for event in events.get_cursor().read(&events) {
-        // info!("SAVE EVENT !! {:?}", event);
+        info!("SAVE EVENT !! {:?}", event);
         save_path.clone_from(&event.path);
     }
     events.clear();
@@ -128,6 +129,7 @@ pub(crate) fn save_game(world: &mut World) {
 
     // for root entities, it is the same EXCEPT we make sure parents are not included
     let filter_root = filter.clone().deny::<ChildOf>();
+
 
     let filter_resources = config
         .clone()

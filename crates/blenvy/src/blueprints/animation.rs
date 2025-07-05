@@ -1,5 +1,6 @@
+use bevy::platform::collections::HashMap;
 use bevy::prelude::*;
-use bevy_platform::collections::HashMap;
+
 #[derive(Component, Reflect, Default, Debug)]
 #[reflect(Component)]
 /// storage for animations for a given entity's BLUEPRINT (ie for example a characters animations)

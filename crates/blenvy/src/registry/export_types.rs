@@ -1,11 +1,11 @@
 use crate::{AssetRoot, BlenvyConfig};
 use bevy::{
-    // log::info,
     prelude::{AppTypeRegistry, ReflectComponent, ReflectResource, World},
     reflect::{TypeInfo, TypeRegistration, VariantInfo},
 };
 use serde_json::{json, Map, Value};
 use std::{fs::File, path::Path};
+use tracing::info;
 
 pub fn export_types(world: &mut World) {
     let config = world
@@ -152,14 +152,14 @@ pub fn export_type(reg: &TypeRegistration) -> (String, Value) {
                 .collect::<Vec<_>>(),
             "items": false,
         }),
-        TypeInfo::List(info) => {
-            json!({
-                "long_name": t.type_path(),
-                "type": "array",
-                "typeInfo": "List",
-                "items": json!({"type": typ(info.item_ty().path())}),
-            })
-        }
+        TypeInfo::List(info) => json!({
+            "long_name": t.type_path(),
+            "type": "array",
+            "typeInfo": "List",
+            "items": json!({
+                "type": typ(info.item_ty().path())
+            }),
+        }),
         TypeInfo::Array(info) => json!({
             "long_name": t.type_path(),
             "type": "array",
@@ -173,11 +173,6 @@ pub fn export_type(reg: &TypeRegistration) -> (String, Value) {
             "valueType": json!({"type": typ(info.value_ty().path())}),
             "keyType": json!({"type": typ(info.key_ty().path())}),
         }),
-        TypeInfo::Set(info) => json!({
-            "long_name": t.type_path(),
-            "type": map_json_type(info.type_path()),
-            "typeInfo": "Set",
-        }),
         TypeInfo::Tuple(info) => json!({
             "long_name": t.type_path(),
             "type": "array",
@@ -188,6 +183,12 @@ pub fn export_type(reg: &TypeRegistration) -> (String, Value) {
                 .map(|(idx, field)| add_min_max(json!({"type": typ(field.type_path())}), reg, idx, None))
                 .collect::<Vec<_>>(),
             "items": false,
+        }),
+        TypeInfo::Set(info) => json!({
+            "long_name": t.type_path(),
+            "type": "set",
+            "typeInfo": "Set",
+            "items": json!({"type": typ(info.value_ty().path())}),
         }),
         TypeInfo::Opaque(info) => json!({
             "long_name": t.type_path(),
