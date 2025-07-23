@@ -23,8 +23,6 @@ pub(crate) use hot_reload::*;
 use bevy::{platform::collections::HashMap, prelude::*};
 
 use crate::GltfComponentsSet;
-use bevy::prelude::*;
-use bevy_platform::collections::HashMap;
 
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 /// set for the two stages of blueprint based spawning :

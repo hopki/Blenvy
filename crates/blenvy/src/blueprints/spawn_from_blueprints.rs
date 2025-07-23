@@ -10,8 +10,6 @@ use crate::{
     BlueprintPreloadAssets, InstanceAnimationInfosLink, InstanceAnimationPlayerLink,
     InstanceAnimations, WatchingForChanges,
 };
-use bevy::{gltf::Gltf, prelude::*, scene::SceneInstance};
-use bevy_platform::collections::HashMap;
 
 /// this is a flag component for our levels/game world
 #[derive(Component)]
@@ -147,7 +145,7 @@ pub(super) fn blueprints_prepare_metadata_file_for_spawn(
     ) in blueprint_instances_to_spawn.iter()
     {
         // get path to assets / metadata file
-        println!(
+        info!(
             "Step 1: spawn request detected: loading metadata file for {:?}",
             blueprint_info
         );
@@ -336,7 +334,7 @@ pub(super) fn blueprints_prepare_spawn(
                 }
             }
         } else {
-            println!("no asset metadata found for {}, please make sure to generate them using the Blender add-on, or preload your assets manually", blueprint_info.path);
+            warn!("no asset metadata found for {}, please make sure to generate them using the Blender add-on, or preload your assets manually", blueprint_info.path);
         }
 
         // Only do this if hot reload is enabled
@@ -406,11 +404,11 @@ pub(crate) fn blueprints_check_assets_loading(
             let asset_id = tracker.id;
             let loaded = asset_server.is_loaded_with_dependencies(asset_id);
             if loaded {
-                println!("LOADED {}", tracker.path.clone());
+                debug!("LOADED {}", tracker.path.clone());
             }
             let mut failed = false;
             if let bevy::asset::LoadState::Failed(_) = asset_server.load_state(asset_id) {
-                println!("FAILED TO LOAD {}", tracker.path.clone());
+                warn!("FAILED TO LOAD {}", tracker.path.clone());
                 failed = true;
             }
             tracker.loaded = loaded || failed;
@@ -463,12 +461,12 @@ pub(crate) fn blueprints_assets_loaded(
             blueprint_info.name, name, entity, original_parent
         );*/
 
-        println!(
+        info!(
             "Step 3: all assets loaded, attempting to spawn blueprint scene {:?} for entity {:?}, id: {}",
             blueprint_info, name, entity
         );
 
-        // println!("attempting to spawn {:?}", model_path);
+        // info!("attempting to spawn {:?}", model_path);
         let model_handle: Handle<Gltf> = asset_server.load(blueprint_info.path.clone());
 
         let blueprint_gltf = assets_gltf.get(&model_handle).unwrap_or_else(|| {
@@ -478,7 +476,7 @@ pub(crate) fn blueprints_assets_loaded(
             )
         });
 
-        // WARNING we work under the assumtion that there is ONLY ONE named scene, and that the first one is the right one
+        // WARNING we work under the assumption that there is ONLY ONE named scene, and that the first one is the right one
         let main_scene_name = blueprint_gltf
             .named_scenes
             .keys()
@@ -513,8 +511,8 @@ pub(crate) fn blueprints_assets_loaded(
         }
         let graph = graphs.add(graph);
 
-        //println!("Named animations : {:?}", named_animations.keys());
-        //println!("ANIMATION INFOS: {:?}", animation_infos);
+        //debug!("Named animations : {:?}", named_animations.keys());
+        //debug!("ANIMATION INFOS: {:?}", animation_infos);
 
         commands.entity(entity).insert((
             SceneRoot(scene.clone()),
@@ -570,7 +568,7 @@ pub(crate) fn blueprints_scenes_spawned(
     all_names: Query<&Name>,
 ) {
     for (entity, name, children, track_root) in spawned_blueprint_scene_instances.iter() {
-        println!(
+        info!(
             "Step 4: Done spawning blueprint scene for entity named {:?} (track root: {:?})",
             name, track_root
         );
@@ -581,7 +579,7 @@ pub(crate) fn blueprints_scenes_spawned(
         if track_root.is_none() {
             for parent in all_parents.iter_ancestors(entity) {
                 if with_blueprint_infos.get(parent).is_ok() {
-                    println!(
+                    debug!(
                         "found a parent with blueprint_info {:?} for {:?}",
                         all_names.get(parent),
                         all_names.get(entity)
@@ -597,12 +595,12 @@ pub(crate) fn blueprints_scenes_spawned(
         if children.is_some() {
             for child in all_children.iter_descendants(entity) {
                 if with_blueprint_infos.get(child).is_ok() {
-                    // println!("Parent blueprint instance of {:?} is {:?}",  all_names.get(child), all_names.get(entity));
+                    // debug!("Parent blueprint instance of {:?} is {:?}",  all_names.get(child), all_names.get(entity));
                     for parent in all_parents.iter_ancestors(child) {
                         if with_blueprint_infos.get(parent).is_ok() {
                             if parent == entity {
-                                //println!("yohoho");
-                                /*println!(
+                                //debug!("yohoho");
+                                /*debug!(
                                     "Parent blueprint instance of {:?} is {:?}",
                                     all_names.get(child),
                                     all_names.get(parent)
@@ -684,11 +682,11 @@ pub(crate) fn blueprints_cleanup_spawned_scene(
     all_names: Query<&Name>,
 ) {
     for (original, children, original_children, name, animations) in blueprint_scenes.iter() {
-        println!("Step 5: Cleaning up spawned scene {:?}", name);
+        info!("Step 5: Cleaning up spawned scene {:?}", name);
 
         if children.len() == 0 {
             // TODO: investigate, Honestly not sure if this issue from Bevy 0.12 is still present at all anymore
-            println!("timing issue ! no children found, please restart your bevy app (bug being investigated)");
+            warn!("timing issue ! no children found, please restart your bevy app (bug being investigated)");
             continue;
         }
         // the root node is the first & normally only child inside a scene, it is the one that has all relevant components
@@ -752,7 +750,7 @@ pub(crate) fn blueprints_cleanup_spawned_scene(
                 if with_animation_infos.get(child).is_ok() {
                     // player is already on the same entity as the animation_infos
                     if animation_players.get(child).is_ok() {
-                        println!(
+                        debug!(
                             "found BLUEPRINT animation player for {:?} at {:?} Root: {:?}",
                             all_names.get(child),
                             all_names.get(child),
@@ -765,13 +763,13 @@ pub(crate) fn blueprints_cleanup_spawned_scene(
                     } else {
                         for parent in all_parents.iter_ancestors(child) {
                             if animation_players.get(parent).is_ok() {
-                                /*println!(
+                                /*debug!(
                                     "found SCENE animation player for {:?} at {:?} Root: {:?}",
                                     all_names.get(child),
                                     all_names.get(parent),
                                     all_names.get(original)
                                 );
-                                println!("INSERTING SCENE ANIMATIONS INTO");*/
+                                debug!("INSERTING SCENE ANIMATIONS INTO");*/
                                 let original_animations = anims.get(original).unwrap();
                                 commands.entity(child).insert((
                                     InstanceAnimationPlayerLink(parent),
@@ -874,7 +872,7 @@ pub(crate) fn blueprints_finalize_instances(
                     }
                     if all_spawned {
                         // let root_name = all_names.get(track_root.0);
-                        // println!("ALLLLL SPAAAAWNED for {} named {:?}", track_root.0, root_name);
+                        // debug!("ALLLLL SPAAAAWNED for {} named {:?}", track_root.0, root_name);
                         commands.entity(track_root.0).insert(BlueprintChildrenReady);
                     }
                 }

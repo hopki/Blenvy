@@ -105,5 +105,5 @@ pub(crate) fn react_to_asset_changes(
         }
     }
 
-    // println!("done with asset updates");
+    info!("done with asset updates");
 }

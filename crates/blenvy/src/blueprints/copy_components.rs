@@ -42,14 +42,14 @@ impl CopyComponents {
 
                     let type_id = component_info.type_id().unwrap();
                     if self.exclude.contains(&type_id) {
-                        // debug!("excluding component: {:?}", component_info.name());
+                        debug!("excluding component: {:?}", component_info.name());
                         None
                     } else {
-                        // debug!(
-                        //     "cloning: component: {:?} {:?}",
-                        //     component_info.name(),
-                        //     type_id
-                        // );
+                        debug!(
+                            "cloning: component: {:?} {:?}",
+                            component_info.name(),
+                            type_id
+                        );
 
                         if let Some(type_registration) = registry.get(type_id) {
                             Some(type_registration)
@@ -61,10 +61,10 @@ impl CopyComponents {
                                 )
                             }));
                         } else {
-                            // warn!(
-                            //     "cannot clone component: component: {:?} is not registered",
-                            //     component_info.name()
-                            // );
+                            warn!(
+                                "cannot clone component: component: {:?} is not registered",
+                                component_info.name()
+                            );
                             None
                         }
                     }
@@ -96,7 +96,7 @@ impl CopyComponents {
                 .get_entity_mut(self.destination)
                 .expect("destination entity should exist");
 
-            // println!("contains typeid {:?} {}", type_id, destination.contains_type_id(type_id));
+            debug!("contains typeid {:?} {}", type_id, destination.contains_type_id(type_id));
             // we only want to copy components that are NOT already in the destination (ie no overwriting existing components)
             if !destination.contains_type_id(type_id) {
                 component.insert(&mut destination, &*source, &type_registry);

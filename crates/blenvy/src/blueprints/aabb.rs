@@ -15,7 +15,7 @@ pub fn compute_scene_aabbs(
 ) {
     // compute compound aabb
     for (root_entity, name) in root_entities.iter() {
-        // // info!("generating aabb for {:?}", name);
+        info!("generating aabb for {:?}", name);
 
         // only recompute aabb if it has not already been done before
         if blenvy_config.aabb_cache.contains_key(&name.to_string()) {
@@ -30,7 +30,7 @@ pub fn compute_scene_aabbs(
         } else {
             let aabb = compute_descendant_aabb(root_entity, &children, &existing_aabbs);
             blenvy_config.aabb_cache.insert(name.to_string(), aabb);
-            // info!("Step 7: generating aabb for {:?}", name);
+            info!("Step 7: generating aabb for {:?}", name);
             commands
                 .entity(root_entity)
                 .insert(aabb)
@@ -48,19 +48,19 @@ pub fn compute_descendant_aabb(
     existing_aabbs: &Query<&Aabb>,
 ) -> Aabb {
     if let Ok(children_list) = children.get(root_entity) {
-        let mut chilren_aabbs: Vec<Aabb> = vec![];
+        let mut children_aabbs: Vec<Aabb> = vec![];
         for child in children_list.iter() {
             if let Ok(aabb) = existing_aabbs.get(child) {
-                chilren_aabbs.push(*aabb);
+                children_aabbs.push(*aabb);
             } else {
                 let aabb = compute_descendant_aabb(child, children, existing_aabbs);
-                chilren_aabbs.push(aabb);
+                children_aabbs.push(aabb);
             }
         }
 
         let mut min = Vec3A::splat(f32::MAX);
         let mut max = Vec3A::splat(f32::MIN);
-        for aabb in chilren_aabbs.iter() {
+        for aabb in children_aabbs.iter() {
             min = min.min(aabb.min());
             max = max.max(aabb.max());
         }

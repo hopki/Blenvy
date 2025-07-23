@@ -49,7 +49,7 @@ pub(crate) fn inject_materials(
                 .materials_cache
                 .contains_key(&material_full_path)
             {
-                // debug!("material is cached, retrieving");
+                debug!("material is cached, retrieving");
                 let material = blenvy_config
                     .materials_cache
                     .get(&material_full_path)
@@ -58,10 +58,10 @@ pub(crate) fn inject_materials(
             } else {
                 let model_handle: Handle<Gltf> = asset_server.load(material_info.path.clone()); // FIXME: kinda weird now
                 let Some(mat_gltf) = assets_gltf.get(model_handle.id()) else {
-                    // warn!(
-                    //     "materials file {} should have been preloaded skipping",
-                    //     material_info.path
-                    // );
+                    warn!(
+                        "materials file {} should have been preloaded skipping",
+                        material_info.path
+                    );
                     continue;
                 };
                 /*let mat_gltf = assets_gltf.get(model_handle.id()).unwrap_or_else(|| {
@@ -86,7 +86,7 @@ pub(crate) fn inject_materials(
             }
 
             if let Some(material) = material_found {
-                // info!("Step 6: injecting/replacing materials");
+                info!("Step 6: injecting/replacing materials");
                 for (child_index, child) in children.iter().enumerate() {
                     if child_index == material_index && with_materials_and_meshes.contains(child) {
                         info!(

@@ -13,7 +13,7 @@ pub fn ronstring_to_reflect_component(
 ) -> Vec<(Box<dyn PartialReflect>, TypeRegistration)> {
     let lookup: HashMap<String, Value> = ron::from_str(ron_string).unwrap();
     let mut components: Vec<(Box<dyn PartialReflect>, TypeRegistration)> = Vec::new();
-    // debug!("ron_string {:?}", ron_string);
+    debug!("ron_string {:?}", ron_string);
     for (name, value) in lookup.into_iter() {
         let parsed_value: String = match value.clone() {
             Value::String(str) => str,
@@ -48,7 +48,7 @@ fn components_string_to_components(
     if let Some(type_registration) =
         type_registry.get_with_short_type_path(capitalized_type_name.as_str())
     {
-        // debug!("TYPE INFO {:?}", type_registration.type_info());
+        debug!("TYPE INFO {:?}", type_registration.type_info());
 
         let ron_string = format!(
             "{{ \"{}\":{} }}",
@@ -85,12 +85,12 @@ fn components_string_to_components(
             return;
         };
 
-        // debug!("component {:?}", component);
-        // debug!("real type {:?}", component.get_represented_type_info());
+        debug!("component {:?}", component);
+        debug!("real type {:?}", component.get_represented_type_info());
         components.push((component, type_registration.clone()));
-        // debug!("found type registration for {}", capitalized_type_name);
+        debug!("found type registration for {}", capitalized_type_name);
     } else {
-        // warn!("no type registration for {}", capitalized_type_name);
+        warn!("no type registration for {}", capitalized_type_name);
     }
 }
 
@@ -107,7 +107,7 @@ fn bevy_components_string_to_components(
         };
 
         if let Some(type_registration) = type_registry.get_with_type_path(key.as_str()) {
-            // debug!("TYPE INFO {:?}", type_registration.type_info());
+            debug!("TYPE INFO {:?}", type_registration.type_info());
 
             let ron_string = format!(
                 "{{ \"{}\":{} }}",
@@ -128,12 +128,12 @@ fn bevy_components_string_to_components(
                     )
                 });
 
-            // debug!("component {:?}", component);
-            // debug!("real type {:?}", component.get_represented_type_info());
+            debug!("component {:?}", component);
+            debug!("real type {:?}", component.get_represented_type_info());
             components.push((component, type_registration.clone()));
-            // debug!("found type registration for {}", key);
+            debug!("found type registration for {}", key);
         } else {
-            // warn!("no type registration for {}", key);
+            warn!("no type registration for {}", key);
         }
     }
 }

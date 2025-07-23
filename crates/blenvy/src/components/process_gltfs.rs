@@ -27,7 +27,7 @@ fn find_entity_components(
     let mut target_entity = entity;
     // if the node contains "components" or ends with "_pa" (ie add to parent), the components will not be added to the entity itself but to its parent
     // this is mostly used for Blender collections
-    if child_of.is_some() {
+    if parent.is_some() {
         if let Some(name) = name {
             if name.as_str().contains("components") || name.as_str().ends_with("_pa") {
                 debug!("adding components to parent");
@@ -35,7 +35,7 @@ fn find_entity_components(
             }
         }
     }
-    // debug!("adding to {:?}", target_entity);
+    debug!("adding to {:?}", target_entity);
 
     // if there where already components set to be added to this entity (for example when entity_data was refering to a parent), update the vec of entity_components accordingly
     // this allows for example blender collection to provide basic ecs data & the instances to override/ define their own values
@@ -71,11 +71,11 @@ pub fn add_components_from_gltf_extras(world: &mut World) {
 
     // let gltf_components_config = world.resource::<GltfComponentsConfig>();
 
-    for (entity, name, extra, child_of) in extras.iter(world) {
-        // debug!(
-        //     "Gltf Extra: Name: {:?}, entity {:?}, parent: {:?}, extras {:?}",
-        //     name, entity, parent, extra
-        // );
+    for (entity, name, extra, parent) in extras.iter(world) {
+        debug!(
+            "Gltf Extra: Name: {:?}, entity {:?}, parent: {:?}, extras {:?}",
+            name, entity, parent, extra
+        );
 
         let type_registry: &AppTypeRegistry = world.resource();
         let type_registry = type_registry.read();
@@ -85,7 +85,7 @@ pub fn add_components_from_gltf_extras(world: &mut World) {
         let (target_entity, updated_components) = find_entity_components(
             entity,
             name,
-            child_of,
+            parent,
             reflect_components,
             &entity_components,
         );
@@ -93,10 +93,10 @@ pub fn add_components_from_gltf_extras(world: &mut World) {
     }
 
     for (entity, name, extra, parent) in scene_extras.iter(world) {
-        // debug!(
-        //     "Gltf Scene Extra: Name: {:?}, entity {:?}, parent: {:?}, scene_extras {:?}",
-        //     name, entity, parent, extra
-        // );
+        debug!(
+            "Gltf Scene Extra: Name: {:?}, entity {:?}, parent: {:?}, scene_extras {:?}",
+            name, entity, parent, extra
+        );
 
         let type_registry: &AppTypeRegistry = world.resource();
         let type_registry = type_registry.read();
@@ -108,10 +108,10 @@ pub fn add_components_from_gltf_extras(world: &mut World) {
     }
 
     for (entity, name, extra, parent) in mesh_extras.iter(world) {
-        // debug!(
-        //     "Gltf Mesh Extra: Name: {:?}, entity {:?}, parent: {:?}, mesh_extras {:?}",
-        //     name, entity, parent, extra
-        // );
+        debug!(
+            "Gltf Mesh Extra: Name: {:?}, entity {:?}, parent: {:?}, mesh_extras {:?}",
+            name, entity, parent, extra
+        );
 
         let type_registry: &AppTypeRegistry = world.resource();
         let type_registry = type_registry.read();
@@ -123,10 +123,10 @@ pub fn add_components_from_gltf_extras(world: &mut World) {
     }
 
     for (entity, name, extra, parent) in material_extras.iter(world) {
-        // debug!(
-        //     "Name: {:?}, entity {:?}, parent: {:?}, material_extras {:?}",
-        //     name, entity, parent, extra
-        // );
+        debug!(
+            "Name: {:?}, entity {:?}, parent: {:?}, material_extras {:?}",
+            name, entity, parent, extra
+        );
 
         let type_registry: &AppTypeRegistry = world.resource();
         let type_registry = type_registry.read();
@@ -143,19 +143,19 @@ pub fn add_components_from_gltf_extras(world: &mut World) {
         let type_registry = type_registry.read();
 
         if !components.is_empty() {
-            // debug!("--entity {:?}, components {}", entity, components.len());
+             debug!("--entity {:?}, components {}", entity, components.len());
         }
         for (component, type_registration) in components {
-            // debug!(
-            //     "------adding {} {:?}",
-            //     component.get_represented_type_info().unwrap().type_path(),
-            //     component
-            // );
+            debug!(
+                "------adding {} {:?}",
+                component.get_represented_type_info().unwrap().type_path(),
+                component
+            );
 
             {
                 let mut entity_mut = world.entity_mut(entity);
                 let Some(reflected_component) = type_registration.data::<ReflectComponent>() else {
-                    // warn!(?component, "unable to reflect component");
+                    warn!(?component, "unable to reflect component");
                     entity_mut.insert(GltfProcessed);
                     continue;
                 };
